@@ -1,46 +1,38 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
+builder.
+    Configuration.
+    AddJsonFile("config/google.json").
+    AddXmlFile("config/apple.xml").
+    AddIniFile("config/microsoft.ini");
 
-var IvanCompany = new Company
-{
-Name = "IvKov DEV",
-CompanyType = "MMM Pyramide"
-};
+app.MapGet("/", () => "Hello, World!");
 
-// endpoint 1
-app.MapGet("/", () =>
+//Завдання 1 - сервіс, який аналізує кількість співробітників
+app.Map("/company", (IConfiguration appConfig) =>
 {
-var companyData = "Company name: " + IvanCompany.Name + ", type: " + IvanCompany.CompanyType;
-return companyData;
+    var name = "";
+    var employees = 0;
+    IConfigurationSection copmanyConfig = appConfig.GetSection("Company");
+    foreach (var item in copmanyConfig.GetChildren())
+    {
+        var currentName = item.Key;
+        var amount = int.Parse(item.GetSection("EmployeesAmount").Value);
+        if (amount > employees)
+        {
+            name = currentName;
+            employees = amount;
+        }
+    }
+    return $"{name}: {employees}";
+
 });
 
-// endpoint 2
-app.MapGet("/random-num", () =>
-{
-var randomNumber = new Random().Next(0, 101);
-return "Random number: " + randomNumber;
-});
+//Завдання 2 - підключення json-файл конфігурації в якому в кількох полях записано деякі дані про Вас
+builder.Configuration.AddJsonFile("config/me.json");
 
-// middleware
-app.Use(async (context, next) =>
-{
-var password = context.Request.Query["admin_credentials"];
-if (password == "secret6696")
-{
-await next();
-}
-else
-{
-context.Response.StatusCode = 401;
-await context.Response.WriteAsync("Invalid credentials");
-}
-});
+app.Map("/me", (IConfiguration appConfig) => $" Ім'я: {appConfig["name"]}\n " +
+        $"Прізвище: {appConfig["surname"]}\n " +
+        $"Вік: {appConfig["age"]}");
 
 app.Run();
-
-public class Company
-{
-    public string? Name { get; set; }
-    public string? CompanyType { get; set; }
-}
-
