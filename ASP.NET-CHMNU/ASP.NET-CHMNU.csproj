@@ -11,8 +11,11 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
     <None Remove="config\" />
+    <None Remove="interfaces\ITimeService.xml" />
+    <None Remove="interfaces\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
+    <Folder Include="interfaces\" />
   </ItemGroup>
 </Project>
