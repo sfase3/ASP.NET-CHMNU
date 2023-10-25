@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <div>
+        <h2>Add Cookie</h2>
+        <form id="addCookieForm">
+            <div>
+                <label for="value">Value:</label>
+                <input type="text" id="value" required>
+            </div>
+            <div>
+                <label for="expiresAt">Cookie Expiration:</label>
+                <input type="datetime-local" id="expiresAt">
+            </div>
+            <div>
+                <button id="addBtn">Add Cookie</button>
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <h2>Check Cookie Existence</h2>
+        <form id="checkCookieForm">
+            <div>
+                <label for="checkCookieName">Value:</label>
+                <input type="text" id="checkCookieName" required>
+            </div>
+            <div>
+                <button id="checkBtn">Check Cookie</button>
+            </div>
+        </form>
+    </div>
+
+    <script>const checkIfCookieExists = async (value) => {
+            const response = await fetch("/api/check-cookie", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Value: value,
+
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message)
+            }
+        }
+
+        const add = async (value, expiresAt) => {
+            const response = await fetch("api/cookie", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Value: value,
+                    ExpiresAt: expiresAt
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message);
+            } else {
+                const error = await response.json();
+                console.log(error.message);
+            }
+        }
+
+
+        document.getElementById("addBtn").addEventListener("click", async () => {
+            const value = document.getElementById("value").value;
+            const expiresAt = document.getElementById("expiresAt").value;
+            if (!value || !expiresAt) {
+                alert("Fields are required!")
+            } else {
+                await add(value, expiresAt);
+            }
+        });
+
+        document.getElementById("checkBtn").addEventListener("click", async () => {
+            const value = document.getElementById("checkCookieName").value;
+
+            if (!value) {
+                alert("Field is required!")
+            } else {
+                await checkIfCookieExists(value)
+            }
+        });</script>
+</body>
+</html>
