@@ -13,6 +13,7 @@
     <None Remove="config\" />
     <None Remove="interfaces\ITimeService.xml" />
     <None Remove="interfaces\" />
+    <None Remove="schemas\EmptyTSFile.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />

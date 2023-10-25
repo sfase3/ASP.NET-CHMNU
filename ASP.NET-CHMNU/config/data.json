@@ -1,0 +1,53 @@
+﻿{
+  "libraryInfo": {
+    "members": [
+      {
+        "fullName": "John Smith",
+        "membershipLevel": "Gold",
+        "libraryCardNumber": "A12345"
+      },
+      {
+        "fullName": "Emily Johnson",
+        "membershipLevel": "Silver",
+        "libraryCardNumber": "B56789"
+      },
+      {
+        "fullName": "Michael Davis",
+        "membershipLevel": "Platinum",
+        "libraryCardNumber": "C98765"
+      },
+      {
+        "fullName": "Sophia Wilson",
+        "membershipLevel": "Bronze",
+        "libraryCardNumber": "D54321"
+      },
+      {
+        "fullName": "James Brown",
+        "membershipLevel": "Silver",
+        "libraryCardNumber": "E67890"
+      }
+    ],
+    "bookCollection": [
+      {
+        "title": "The Art of War",
+        "author": "Sun Tzu",
+        "publishedYear": -500
+      },
+      {
+        "title": "A Brief History of Time",
+        "author": "Stephen Hawking",
+        "publishedYear": 1988
+      },
+      {
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "publishedYear": 1960
+      },
+      {
+        "title": "1984",
+        "author": "George Orwell",
+        "publishedYear": 1949
+      }
+    ]
+  }
+}

@@ -1,104 +1,105 @@
-using MyApp.services.CalcService;
-using MyApp.services.TimeService;
+using Microsoft.AspNetCore.Http;
+using MyApp.schemas;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder();
-builder.Services
-    .AddTransient<ICalcService, CalcService>()
-    .AddTransient<ITimeService, TimeService>();
-
+WebApplicationBuilder builder = WebApplication.CreateBuilder();
 var app = builder.Build();
+builder.Configuration.AddJsonFile("config/data.json");
 
-app.MapPost("/calc", async context =>
+app.Map("/users/{id:int?}", async (int? id, HttpContext context, IConfiguration appConfig) =>
 {
-    ICalcService? calcService = context.RequestServices.GetService<ICalcService>();
-    var form = await context.Request.ReadFormAsync();
-    var num1 = int.Parse(form["num1"]);
-    var num2 = int.Parse(form["num2"]);
-    var operation = form["operation"];
-    var port = context.Request.Host.Port;
-    float result = 0;
+    Member[] members = appConfig.GetSection("libraryInfo:members").Get<Member[]>();
+    StringBuilder sb = new StringBuilder();
+    sb.Append("<html><head><style>");
+    sb.Append("body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 20px; }");
+    sb.Append(".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }");
+    sb.Append("h3 { color: #333; }");
+    sb.Append("p { margin: 10px 0; }");
+    sb.Append("</style></head><body>");
 
-    switch (operation)
+    if (id.HasValue && members != null && id.Value >= 0 && id.Value < members.Length)
     {
-        case "+":
-        default:
-            result = calcService.Sum(num1, num2);
-            break;
-        case "-":
-            result = calcService.Subtract(num1, num2);
-            break;
-        case "*":
-            result = calcService.Multiply(num1, num2);
-            break;
-        case "/":
-            result = calcService.Divide(num1, num2);
-            break;
+        sb.Append("<div class='container'><h3>User's Profile</h3>");
+        sb.Append($"<p>Name: {members[id.Value].FullName}</p>");
+        sb.Append($"<p>Membership level: {members[id.Value].MembershipLevel}</p>");
+        sb.Append($"<p>Library Card Number: {members[id.Value].LibraryCardNumber}</p>");
+        sb.Append("</div>");
     }
 
-    context.Response.ContentType = "text/html;charset=utf-8";
-    var responseHtml =
-    $"<h2>Answer: {result}</h2>";
-    context.Response.StatusCode = 200;
-    await context.Response.WriteAsync(responseHtml);
-});
-
-app.MapGet("/", async context =>
-{
-    var sb = new StringBuilder();
-
-    sb.Append(
-        "<div style=\"text-align: center;\">" +
-            "<h1>Simple Calculator</h1>" +
-            "<form method=\"post\" action=\"/calc\">" +
-                "<div style=\"margin: 10px;\">" +
-                    "<input type=\"number\" name=\"num1\" placeholder=\"Enter a number\" required>" +
-                "</div>" +
-                "<div style=\"margin: 10px;\">" +
-                    "<select name=\"operation\" required>" +
-                        "<option value=\"+\">Addition (+)</option>" +
-                        "<option value=\"-\">Subtraction (-)</option>" +
-                        "<option value=\"*\">Multiplication (*)</option>" +
-                        "<option value=\"/\">Division (/)</option>" +
-                    "</select>" +
-                "</div>" +
-                "<div style=\"margin: 10px;\">" +
-                    "<input type=\"number\" name=\"num2\" placeholder=\"Enter another number\" required>" +
-                "</div>" +
-                "<button type=\"submit\">" +
-                    "Calculate" +
-                "</button>" +
-            "</form>" +
-        "</div>"
-        );
-
-    context.Response.ContentType = "text/html;charset=utf-8";
-
+    sb.Append("</body></html>");
     await context.Response.WriteAsync(sb.ToString());
 });
 
-
-app.MapGet("/gettime", async context =>
+app.Map("/library-main", async (HttpContext context, IConfiguration appConfig) =>
 {
-    ITimeService? timeService = context.RequestServices.GetService<ITimeService>();
-    string datePhrase = timeService.GetDatePhrase();
+    StringBuilder sb = new StringBuilder();
+    sb.Append("<html><head><style>");
+    sb.Append("body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 20px; }");
+    sb.Append(".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }");
+    sb.Append("h3 { color: #333; }");
+    sb.Append("p { margin: 10px 0; }");
+    sb.Append("</style></head><body>");
 
-    var pageContent = new StringBuilder();
-    pageContent.Append(
-        "<html>" +
-        "<head>" +
-        "<title>Current Time</title>" +
-        "</head>" +
-        "<body style='font-family: Arial, sans-serif; text-align: center;'>" +
-        $"<h1>Hello</h1>" +
-        $"<p>{datePhrase}</p>" +
-        "</body>" +
-        "</html>");
-
-    context.Response.ContentType = "text/html;charset=utf-8";
-    context.Response.StatusCode = 200;
-    await context.Response.WriteAsync(pageContent.ToString());
+    sb.Append("<div class='container'><h3>Welcome to the Library</h3>");
+    sb.Append("</div>");
+    sb.Append("</body></html>");
+    await context.Response.WriteAsync(sb.ToString());
 });
 
+app.Map("/library/books", async (HttpContext context, IConfiguration appConfig) =>
+{
+    Book[] books = appConfig.GetSection("libraryInfo:bookCollection").Get<Book[]>();
+    StringBuilder sb = new StringBuilder();
+    sb.Append("<html><head><style>");
+    sb.Append("body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 20px; }");
+    sb.Append(".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }");
+    sb.Append("h3 { color: #333; }");
+    sb.Append("p { margin: 10px 0; }");
+    sb.Append("</style></head><body>");
+
+    sb.Append("<div class='container'><h3>Library Books</h3>");
+    foreach (var book in books)
+    {
+        sb.Append($"<p>Book Title: {book.Title}</p>");
+        sb.Append($"<p>Publishing year: {book.PublishedYear}</p>");
+        sb.Append($"<p>Author: {book.Author}</p>");
+    }
+    sb.Append("</div>");
+    sb.Append("</body></html>");
+    await context.Response.WriteAsync(sb.ToString());
+});
+
+app.Map("/", async (HttpContext context, IConfiguration appConfig) =>
+{
+    Member[] members = appConfig.GetSection("libraryInfo:members").Get<Member[]>();
+    StringBuilder sb = new StringBuilder();
+    sb.Append("<html><head><style>");
+    sb.Append("body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 20px; }");
+    sb.Append(".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }");
+    sb.Append("h3 { color: #333; }");
+    sb.Append("p { margin: 10px 0; }");
+    sb.Append("</style></head><body>");
+
+    sb.Append("<div class='container'><h3>Welcome to the Library</h3>");
+    sb.Append("<ul>");
+    sb.Append("<li><a href='/library-main'>Visit the Library</a></li>");
+    sb.Append("<li><a href='/library/books'>Explore Books</a></li>");
+    for (int i = 0; i < members.Length; i++)
+    {
+        sb.Append($"<li><a href='/users/{i}'>{members[i].FullName}'s Page</a></li>");
+    }
+    sb.Append("</ul>");
+    sb.Append("</div>");
+    sb.Append("</body></html>");
+    await context.Response.WriteAsync(sb.ToString());
+});
+
+app.Use(async (context, next) =>
+{
+    await next.Invoke();
+    if (context.Response.StatusCode == 404)
+        await context.Response.WriteAsync("Resource Not Found");
+});
 
 app.Run();
+
