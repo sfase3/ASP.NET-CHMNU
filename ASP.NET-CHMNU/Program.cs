@@ -41,7 +41,6 @@ app.Run(async (context) =>
             }
             else
             {
-                app.Logger.LogError($"LogError {path} - Invalid data");
                 throw new Exception("Invalid data");
             }
         }
@@ -67,29 +66,22 @@ app.Run(async (context) =>
                 }
                 else
                 {
-                    await response.WriteAsJsonAsync(new { message = "Not found" });
+                    throw new Exception("Cookie doesn't exist " + cookieRecordName.Value);
                 }
             }
             else
             {
-                app.Logger.LogError($"LogError {path} - Invalid data");
                 throw new Exception("Invalid data");
             }
         }
         catch (Exception err)
         {
-            response.StatusCode = 400;
-            app.Logger.LogError($"LogError {path} - Exception: Invalid data");
-            await response.WriteAsJsonAsync(new { message = "Exception: Invalid data" });
-
-            var now = DateTime.Now.ToString();
-            app.Logger.LogError(err.Message + " was at " + now);
-            throw;
+            response.StatusCode = 404;
+            app.Logger.LogError(err.Message);
         }
     }
     else
     {
-        app.Logger.LogError($"LogError {path} - Path not found");
         response.ContentType = "text/html; charset=utf-8";
         await response.SendFileAsync("index.html");
     }

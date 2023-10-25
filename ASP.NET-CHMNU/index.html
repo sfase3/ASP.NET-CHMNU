@@ -67,7 +67,8 @@
         }
 
 
-        document.getElementById("addBtn").addEventListener("click", async () => {
+        document.getElementById("addBtn").addEventListener("click", async (e) => {
+            e.preventDefault();
             const value = document.getElementById("value").value;
             const expiresAt = document.getElementById("expiresAt").value;
             if (!value || !expiresAt) {
@@ -77,7 +78,8 @@
             }
         });
 
-        document.getElementById("checkBtn").addEventListener("click", async () => {
+        document.getElementById("checkBtn").addEventListener("click", async (e) => {
+            e.preventDefault();
             const value = document.getElementById("checkCookieName").value;
 
             if (!value) {
